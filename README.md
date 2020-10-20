@@ -69,3 +69,8 @@ Benchmark rate summary:
 
 Done!
 ```
+
+We can also deploy an openairinterface enodeb (CTRL-C to terminate):
+```
+kubectl run test-usrp-oai -ti --rm --privileged --image openverso/oai-enb:1.2.2 --limits="ettus.com/usrp=1"
+```
