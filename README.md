@@ -3,8 +3,14 @@
 This code provides a Kubernetes [Device Plugin](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/device-plugins/)
 to manage Ettus USRPs as Kubernetes Node Resources.
 
-Currently supported USRPS are:
+Currently tested USRPS are:
 - B210.
+
+It should work with:
+- B200.
+- B210.
+- B200Mini.
+- B205Mini.
 
 The device plugin detects and registers connected USRPs. It also download uhd_images in node path '/usr/share/uhd/images'.
 When a pod request a "ettus.com/usrp" resource, the ettus device plugin automatically attach the corresponding '/dev/bus/usb/' device and mounts '/usr/share/uhd/images' hostPath in the pod.

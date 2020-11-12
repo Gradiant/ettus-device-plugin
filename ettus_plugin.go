@@ -44,9 +44,6 @@ const (
 	B205MiniProductID = "0022"
 	B200NiProductID   = "7813"
 	B210NiProductID   = "7814"
-	Fx3Vid            = "04b4"
-	Fx3DefaultPid     = "00f3"
-	Fx3ReenumPid      = "00f0"
 )
 const (
 	SysfsDevices = "/sys/bus/usb/devices"
@@ -118,10 +115,23 @@ func (ettus *ettusManager) discoverEttusResources() (bool, error) {
 		if strings.EqualFold(vendorID, EttusVendorID) {
 			switch productID {
 			case B200ProductID:
-				productName = "B210"
+				productName = "B200"
+			case B200MiniProductID:
+				productName = "B200Mini"
+			case B205MiniProductID:
+				productName = "B205Mini"
 			default:
 				continue
 			}
+		} else if strings.EqualFold(vendorID, EttusNiVendorID) {
+			switch productID {
+			case B200NiProductID:
+				productName = "B200"
+			case B210NiProductID:
+				productName = "B210"
+			default:
+				continue
+			} 
 		} else {
 			continue
 		}

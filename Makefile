@@ -1,6 +1,7 @@
 .PHONY: all build docker
 
-build: 
+build:
+	go get -d ./. 
 	go build -o bin/ettus-device-plugin
 
 docker: build
