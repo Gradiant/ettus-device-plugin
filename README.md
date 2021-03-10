@@ -15,22 +15,25 @@ It should work with:
 The device plugin detects and registers connected USRPs. It also download uhd_images in node path '/usr/share/uhd/images'.
 When a pod request a "ettus.com/usrp" resource, the ettus device plugin automatically attach the corresponding '/dev/bus/usb/' device and mounts '/usr/share/uhd/images' hostPath in the pod.
 
-## Build Binary
+## Build Docker Image
 
 ```
-make build
+make docker
 ```
 
-This will generate bin/ettus-device-plugin binary.
+This will create a docker image with `ettus-device-plugin` and `uhd_images_downloader` binaries.
 
-## Deployment
+## Manual Deployment
 
-You can run ettus-device-plugin manually at each node or with the provided DaemonSet.
+You can run ettus-device-plugin binary manually at each node. 
+Remember to also have [uhd_images_downloader](./bin/uhd_image_downloader) in the PATH of your nodes. 
+
 You must run it as superuser because the binary must access /dev/bus/serial and create /usr/share/uhd/images to download uhd_images.
 
-You must have ettus device attached prior to run the ettus-device-plugin. We plan to support dynamic attach-dettach of usrps in the future.
+You must have ettus device attached to host USB prior to run the `ettus-device-plugin`. We plan to support dynamic attach-dettach of USRPs in the future.
 
-After deployment, you can check if USRPs are detected and included as node resources with:
+After running the `ettus-device-plugin` binary you can check if USRPs are detected and included as node resources with:
+
 ```
 kubectl get nodes -o go-template --template='{{range .items}}{{printf "%s %s\n" .metadata.name .status.allocatable}}{{end}}'
 
@@ -38,27 +41,17 @@ kube-node1 map[cpu:8 ephemeral-storage:385306984Ki ettus.com/usrp:1 hugepages-1G
 ```
 
 ## Deploy as DaemonSet
+
 We also include 'ettus-daemonset.yaml' to deploy ettus-device-plugin as a DaemonSet so you can rely on Kubernetes to: place the device plugin's Pod onto Nodes, to restart the daemon Pod after failure, and to help automate upgrades.
 
-We have not yet published ettus-device-plugin docker images, so you must build the image locally and distribute it to your kubernetes nodes.
-
-To build the docker image:
-
-```
-make docker
-```
-
-If you are trying a local kubernetes (microk8s or k3s), you can import the local image with:
-```
-./containerd_image_import.sh [microk8s|k3s] gradiant/ettus-device-plugin:0.0.1
-```
+DaemonSet runs with privileged securityContext. If you have enabled *pod security policy control* in your cluster, you have to configure your [Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) to enable the execution of privileged pods.
 
 
 ## Test a Pod
-The following command run a pod asking for an ettus/usrp. The image cgiraldo/ettus-uhd includes uhd libraries and examples (not the uhd images, that are automatically mounted by the ettus device plugin):
+The following command run a pod asking for an ettus/usrp. The image openverso/ettus-uhd includes uhd libraries and examples (not the uhd images, that are automatically mounted by the ettus device plugin):
 
 ```
-kubectl run test-usrp -ti --rm --privileged --image cgiraldo/ettus-uhd --limits="ettus.com/usrp=1" -- benchmark_rate --rx_rate 10e6 --tx_rate 10e6
+kubectl run test-usrp -ti --rm --privileged --image openverso/ettus-uhd --limits="ettus.com/usrp=1" -- benchmark_rate --rx_rate 10e6 --tx_rate 10e6
 ...
 Benchmark rate summary:
   Num received samples:     102221483
@@ -77,6 +70,7 @@ Done!
 ```
 
 We can also deploy an openairinterface enodeb (CTRL-C to terminate):
+
 ```
 kubectl run test-usrp-oai -ti --rm --privileged --image openverso/oai-enb:1.2.2 --limits="ettus.com/usrp=1"
 ```

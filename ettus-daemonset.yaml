@@ -27,7 +27,7 @@ spec:
         name: ettus-device-plugin
     spec:
       containers:
-      - image: cgiraldo/ettus-device-plugin:0.0.1
+      - image: gradiant/ettus-device-plugin:0.0.1
         name: ettus-device-plugin
         securityContext:
           privileged: true
