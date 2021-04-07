@@ -27,6 +27,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"log"
 
 	"github.com/golang/glog"
 
@@ -164,7 +165,7 @@ func (ettus *ettusManager) discoverEttusResources() (bool, error) {
 		ettus.devices[serial] = &dev
 		found = true
 	}
-	fmt.Printf("Devices: %v \n", ettus.devices)
+	log.Printf("Devices: %v \n", ettus.devices)
 	return found, nil
 }
 
@@ -172,14 +173,14 @@ func (ettus *ettusManager) DownloadUhdImages() error {
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 
-	fmt.Println("Downloading uhd_images. Be patient")
+	log.Println("Downloading uhd_images. Be patient")
 
 	cmd := exec.Command("uhd_images_downloader")
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		fmt.Println("Error: CMD uhd_images_downloader: " + fmt.Sprint(err) + ": " + stderr.String())
+		log.Println("Error: CMD uhd_images_downloader: " + fmt.Sprint(err) + ": " + stderr.String())
 	}
 	return err
 }
@@ -267,13 +268,13 @@ func (ettus *ettusManager) PreStartContainer(ctx context.Context, rqt *pluginapi
 }
 
 func (ettus *ettusManager) GetDevicePluginOptions(ctx context.Context, empty *pluginapi.Empty) (*pluginapi.DevicePluginOptions, error) {
-	fmt.Println("GetDevicePluginOptions: return empty options")
+	log.Println("GetDevicePluginOptions: return empty options")
 	return new(pluginapi.DevicePluginOptions), nil
 }
 
 func main() {
 	flag.Parse()
-	fmt.Printf("Starting main \n")
+	log.Printf("Starting main \n")
 
 	flag.Lookup("logtostderr").Value.Set("true")
 
@@ -306,8 +307,8 @@ func main() {
 	// Starts device plugin service.
 	go func() {
 		defer wg.Done()
-		fmt.Printf("DveicePluginPath %s, pluginEndpoint %s\n", pluginapi.DevicePluginPath, pluginEndpoint)
-		fmt.Printf("device-plugin start server at: %s\n", path.Join(pluginapi.DevicePluginPath, pluginEndpoint))
+		log.Printf("DveicePluginPath %s, pluginEndpoint %s\n", pluginapi.DevicePluginPath, pluginEndpoint)
+		log.Printf("device-plugin start server at: %s\n", path.Join(pluginapi.DevicePluginPath, pluginEndpoint))
 		lis, err := net.Listen("unix", path.Join(pluginapi.DevicePluginPath, pluginEndpoint))
 		if err != nil {
 			glog.Fatal(err)
@@ -324,6 +325,6 @@ func main() {
 	if err != nil {
 		glog.Fatal(err)
 	}
-	fmt.Printf("device-plugin registered\n")
+	log.Printf("device-plugin registered\n")
 	wg.Wait()
 }
