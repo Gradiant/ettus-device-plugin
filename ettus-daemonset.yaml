@@ -36,6 +36,8 @@ spec:
             mountPath: /var/lib/kubelet/device-plugins
           - name: uhd-images
             mountPath: /usr/share/uhd/images
+      tolerations:
+      - operator: Exists
       volumes:
         - name: device-plugin
           hostPath:
