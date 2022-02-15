@@ -26,6 +26,11 @@ spec:
       labels:
         name: ettus-device-plugin
     spec:
+      tolerations:
+      - operator: "Exists"
+        effect: "NoExecute"
+      - operator: "Exists"
+        effect: "NoSchedule"
       containers:
       - image: gradiant/ettus-device-plugin:0.0.1
         name: ettus-device-plugin
