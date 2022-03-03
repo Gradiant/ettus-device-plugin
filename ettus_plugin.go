@@ -62,7 +62,7 @@ type ettusDevice struct {
 	vid     string
 	pid     string
 	name    string
-	devPath string
+	busNum string
 	devNum  string
 	device  pluginapi.Device
 }
@@ -136,8 +136,8 @@ func (ettus *ettusManager) discoverEttusResources() (bool, error) {
 		} else {
 			continue
 		}
-		fname = path.Join(SysfsDevices, usbID, "devpath")
-		devpath, err := GetFileContent(fname)
+		fname = path.Join(SysfsDevices, usbID, "busnum")
+		busnum, err := GetFileContent(fname)
 		if err != nil {
 			return false, err
 		}
@@ -156,7 +156,7 @@ func (ettus *ettusManager) discoverEttusResources() (bool, error) {
 			vid:     vendorID,
 			pid:     productID,
 			name:    productName,
-			devPath: fmt.Sprintf("%03s", devpath),
+			busNum: fmt.Sprintf("%03s", busnum),
 			devNum:  fmt.Sprintf("%03s", devnum),
 			device: pluginapi.Device{
 				ID:     serial,
@@ -241,7 +241,7 @@ func (ettus *ettusManager) Allocate(ctx context.Context, rqt *pluginapi.Allocate
 		resp.ContainerResponses = append(resp.ContainerResponses, containerResp)
 		for _, id := range containerRqt.DevicesIDs {
 			if dev, ok := ettus.devices[id]; ok {
-				devPath := path.Join("/dev/bus/usb/", dev.devPath, dev.devNum)
+				devPath := path.Join("/dev/bus/usb/", dev.busNum, dev.devNum)
 				containerResp.Devices = append(containerResp.Devices, &pluginapi.DeviceSpec{
 					HostPath:      devPath,
 					ContainerPath: devPath,
