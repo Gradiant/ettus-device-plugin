@@ -284,16 +284,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	found, err := ettus.discoverEttusResources()
-	if err != nil {
-		glog.Fatal(err)
-		os.Exit(1)
-	}
-	if !found {
-		// clean up any exisiting device plugin software
-		//sfc.UnInit()
-		glog.Errorf("No Ettus are present\n")
-		os.Exit(1)
+	for {
+		found, err := ettus.discoverEttusResources()
+		if err != nil {
+			glog.Fatal(err)
+			os.Exit(1)
+		}
+		if found {
+			break
+		}
+		glog.Warning("No Ettus are present\n")
+		time.Sleep(5 * time.Second)
 	}
 
 	err = ettus.Init()
