@@ -51,7 +51,7 @@ DaemonSet runs with privileged securityContext. If you have enabled *pod securit
 The following command run a pod asking for an ettus/usrp. The image openverso/ettus-uhd includes uhd libraries and examples (not the uhd images, that are automatically mounted by the ettus device plugin):
 
 ```
-kubectl run test-usrp -ti --rm --privileged --image openverso/ettus-uhd --limits="ettus.com/usrp=1" -- benchmark_rate --rx_rate 10e6 --tx_rate 10e6
+kubectl run test-usrp -ti --rm --privileged --image openverso/ettus-uhd --override-type=strategic --overrides='{"spec":{"containers":[{"name":"test-usrp","resources":{"limits":{"ettus.com/usrp":"1"}}}]}}' -- benchmark_rate --rx_rate 10e6 --tx_rate 10e6
 ...
 Benchmark rate summary:
   Num received samples:     102221483
@@ -72,5 +72,5 @@ Done!
 We can also deploy an openairinterface enodeb (CTRL-C to terminate):
 
 ```
-kubectl run test-usrp-oai -ti --rm --privileged --image openverso/oai-enb:1.2.2 --limits="ettus.com/usrp=1"
+kubectl run test-usrp-oai -ti --rm --privileged --image openverso/oai-enb:1.2.2 -override-type=strategic --overrides='{"spec":{"containers":[{"name":"test-usrp","resources":{"limits":{"ettus.com/usrp":"1"}}}]}}'
 ```
